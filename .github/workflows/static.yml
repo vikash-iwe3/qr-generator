@@ -4,7 +4,7 @@ name: Deploy static content to Pages
 on:
   # Runs on pushes targeting the default branch
   push:
-    branches: ["feat/qr-studio-generator-15571589971207888890"]
+    branches: ["feat/qr-studio-generator-15571589971207888890/index.html"]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
