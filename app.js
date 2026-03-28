@@ -74,7 +74,8 @@ document.addEventListener('DOMContentLoaded', () => {
             value: text,
             date: new Date().toLocaleString(),
             fg: fgColorInput.value,
-            bg: bgColorInput.value
+            bg: bgColorInput.value,
+            ec: ecLevel
         };
 
         // Avoid duplicates in recent history
@@ -97,13 +98,27 @@ document.addEventListener('DOMContentLoaded', () => {
             history.forEach(item => {
                 const el = document.createElement('div');
                 el.className = 'history-item';
-                el.innerHTML = `
-                    <div class="history-item-qr" id="hist-qr-${item.id}"></div>
-                    <div class="history-item-info">
-                        <div class="history-item-value">${item.value}</div>
-                        <div class="history-item-date">${item.date}</div>
-                    </div>
-                `;
+
+                const qrContainer = document.createElement('div');
+                qrContainer.className = 'history-item-qr';
+                qrContainer.id = `hist-qr-${item.id}`;
+
+                const infoContainer = document.createElement('div');
+                infoContainer.className = 'history-item-info';
+
+                const valueEl = document.createElement('div');
+                valueEl.className = 'history-item-value';
+                valueEl.textContent = item.value;
+
+                const dateEl = document.createElement('div');
+                dateEl.className = 'history-item-date';
+                dateEl.textContent = item.date;
+
+                infoContainer.appendChild(valueEl);
+                infoContainer.appendChild(dateEl);
+
+                el.appendChild(qrContainer);
+                el.appendChild(infoContainer);
 
                 el.addEventListener('click', () => {
                     qrInput.value = item.value;
@@ -111,6 +126,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     bgColorInput.value = item.bg;
                     fgLabel.textContent = item.fg.toUpperCase();
                     bgLabel.textContent = item.bg.toUpperCase();
+
+                    if (item.ec) {
+                        ecLevel = item.ec;
+                        ecButtons.forEach(b => {
+                            if (b.getAttribute('data-value') === item.ec) {
+                                b.classList.add('active');
+                            } else {
+                                b.classList.remove('active');
+                            }
+                        });
+                    }
+
                     switchTab('create');
                     updateQR();
                 });
