@@ -1,16 +1,183 @@
-<!doctype html>
-<html lang="en" class="h-full bg-slate-50 dark:bg-slate-900">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <meta name="theme-color" content="#3b82f6" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <title>QR Studio | Generate & Design QRs</title>
-  </head>
-  <body class="h-full text-slate-900 dark:text-slate-100 antialiased overflow-hidden">
-    <div id="root" class="h-full"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#3b82f6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>QR Studio | Pro QR Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- QRCode.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Desktop Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <div class="brand-icon">
+                    <i data-lucide="qr-code"></i>
+                </div>
+                <h1>QR Studio</h1>
+            </div>
+
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-tab="create">
+                    <i data-lucide="plus"></i>
+                    <span>Create New</span>
+                </button>
+                <button class="nav-item" data-tab="history">
+                    <i data-lucide="history"></i>
+                    <span>History</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button class="nav-item footer-item">
+                    <i data-lucide="settings"></i>
+                    <span>Settings</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Mobile Header -->
+            <header class="mobile-header">
+                <div class="brand-icon small">
+                    <i data-lucide="qr-code"></i>
+                </div>
+                <span class="mobile-title">QR Studio</span>
+                <button class="menu-btn" id="menu-toggle">
+                    <i data-lucide="menu"></i>
+                </button>
+            </header>
+
+            <div id="create-view" class="view active">
+                <div class="editor-layout">
+                    <!-- Controls Section -->
+                    <div class="editor-controls">
+                        <section class="control-group">
+                            <label class="label">Content</label>
+                            <div class="textarea-wrapper">
+                                <textarea id="qr-input" placeholder="Paste URL or type text here..."></textarea>
+                                <button id="copy-text-btn" class="icon-btn" title="Copy Text">
+                                    <i data-lucide="copy"></i>
+                                </button>
+                            </div>
+                        </section>
+
+                        <div class="grid-controls">
+                            <section class="control-group">
+                                <label class="label">Foreground</label>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" id="fg-color" value="#000000">
+                                    <span id="fg-label">#000000</span>
+                                </div>
+                            </section>
+                            <section class="control-group">
+                                <label class="label">Background</label>
+                                <div class="color-picker-wrapper">
+                                    <input type="color" id="bg-color" value="#ffffff">
+                                    <span id="bg-label">#FFFFFF</span>
+                                </div>
+                            </section>
+                        </div>
+
+                        <section class="control-group">
+                            <label class="label">Error Correction</label>
+                            <div class="segmented-control" id="ec-level">
+                                <button data-value="L">Low</button>
+                                <button data-value="M" class="active">Medium</button>
+                                <button data-value="Q">Quartile</button>
+                                <button data-value="H">High</button>
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- Preview Section -->
+                    <div class="preview-panel">
+                        <div class="preview-card">
+                            <div id="qrcode-container" class="qrcode-wrapper">
+                                <div id="qrcode"></div>
+                                <div id="qrcode-placeholder" class="placeholder">
+                                    <i data-lucide="qr-code" class="placeholder-icon"></i>
+                                    <p>Preview will appear here</p>
+                                </div>
+                            </div>
+
+                            <div class="preview-actions">
+                                <button id="download-btn" class="primary-btn" disabled>
+                                    <i data-lucide="download"></i>
+                                    Download PNG
+                                </button>
+                                <button id="share-btn" class="secondary-btn" disabled>
+                                    <i data-lucide="share-2"></i>
+                                    Share Code
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="history-view" class="view">
+                <div class="history-header">
+                    <h2>Recent Generations</h2>
+                    <button id="clear-history" class="text-btn danger">
+                        <i data-lucide="trash-2"></i>
+                        Clear All
+                    </button>
+                </div>
+                <div id="history-list" class="history-grid">
+                    <!-- History items will be injected here -->
+                </div>
+                <div id="empty-history" class="empty-state">
+                    <i data-lucide="history" class="placeholder-icon"></i>
+                    <p>No history yet</p>
+                </div>
+            </div>
+
+            <!-- Mobile Bottom Nav -->
+            <nav class="mobile-nav">
+                <button class="nav-item active" data-tab="create">
+                    <i data-lucide="plus"></i>
+                    <span>Create</span>
+                </button>
+                <button class="nav-item" data-tab="history">
+                    <i data-lucide="history"></i>
+                    <span>History</span>
+                </button>
+            </nav>
+        </main>
+    </div>
+
+    <!-- Mobile Sidebar Drawer -->
+    <div id="sidebar-drawer" class="drawer">
+        <div class="drawer-overlay"></div>
+        <div class="drawer-content">
+            <div class="drawer-header">
+                <div class="brand-icon small">
+                    <i data-lucide="qr-code"></i>
+                </div>
+                <span>QR Studio</span>
+                <button class="close-btn">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+            <nav class="drawer-nav">
+                <button>Upgrade to Pro</button>
+                <button>Saved Templates</button>
+                <button><i data-lucide="settings"></i> Settings</button>
+            </nav>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
 </html>
